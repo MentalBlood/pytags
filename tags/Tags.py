@@ -23,13 +23,13 @@ class Tags:
 				args = (
 					'ffmpeg',
 					'-v', 'error',
-					'-i', '-'
+					'-i', '-',
 					'-f', 'null',
 					'-'
 				),
 				input          = self.data,
 				capture_output = True
-			).stdout.decode()
+			).stderr.decode()
 		):
 			raise Tags.ValueError(f'ffmpeg have errors checking data: {errors}')
 
@@ -96,3 +96,16 @@ class Tags:
 			input          = self.data,
 			capture_output = True
 		).stdout or None
+
+	# def covered(self, cover: bytes):
+	# 	return Tags(
+	# 		subprocess.run(
+	# 			args = (
+	# 				'ffmpeg',
+	# 				'-i', '-',
+	# 				'-i', '-', -map 0:a -map 1 -codec copy -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (front)" -disposition:v attached_pic output.flac
+	# 			),
+	# 			input = self.data,
+	# 			capture_output = True
+	# 		).stdout
+	# 	)

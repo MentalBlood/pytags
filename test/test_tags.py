@@ -39,4 +39,9 @@ def test_set(key: str, value: str = 'value'):
 
 def test_nonexistent_key():
 	with pytest.raises(KeyError):
-		assert audio()['nonexistent_key']
+		audio()['nonexistent_key']
+
+
+def test_invalid_data():
+	with pytest.raises(tags.Tags.ValueError):
+		tags.Tags(b'invalid_data')
