@@ -8,7 +8,7 @@ from .. import tags
 
 @functools.lru_cache
 def audio():
-	return tags.Tags(pathlib.Path('test.mp3').read_bytes())
+	return tags.Tags(tags.Media(pathlib.Path('test.mp3').read_bytes()))
 
 
 @pytest.mark.parametrize(
@@ -43,5 +43,5 @@ def test_nonexistent_key():
 
 
 def test_invalid_data():
-	with pytest.raises(tags.Tags.ValueError):
-		tags.Tags(b'invalid_data')
+	with pytest.raises(tags.Media.ValueError):
+		tags.Media(b'invalid_data')

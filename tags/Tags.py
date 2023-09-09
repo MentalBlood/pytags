@@ -3,35 +3,14 @@ import functools
 import subprocess
 import dataclasses
 
+from .Media import Media
+
 
 
 @dataclasses.dataclass(frozen = False, kw_only = False)
 class Tags:
 
-	data : bytes
-
-	class ValueError(ValueError):
-		pass
-
-	def __post_init__(self):
-
-		if not self.data:
-			raise Tags.ValueError('No data provided (empty bytes object)')
-
-		if (
-			errors := subprocess.run(
-				args = (
-					'ffmpeg',
-					'-v', 'error',
-					'-i', '-',
-					'-f', 'null',
-					'-'
-				),
-				input          = self.data,
-				capture_output = True
-			).stderr.decode()
-		):
-			raise Tags.ValueError(f'ffmpeg have errors checking data: {errors}')
+	source : Media
 
 	def __getitem__(self, key: str):
 		try:
@@ -47,7 +26,7 @@ class Tags:
 								f'format_tags={key}',
 								'-'
 							),
-							input          = self.data,
+							input          = self.source.data,
 							capture_output = True
 						).stdout.decode()
 					)
@@ -58,28 +37,30 @@ class Tags:
 
 	def __call__(self, **tags: str):
 		return Tags(
-			subprocess.run(
-				args = (
-					'ffmpeg',
-					'-i', '-',
-					'-map', '0',
-					'-y',
-					'-codec', 'copy',
-					'-write_id3v2', '1',
-					*(
-						element
-						for pair in (
-							('-metadata', f'{key}={value}')
-							for key, value in tags.items()
-						)
-						for element in pair
+			Media(
+				subprocess.run(
+					args = (
+						'ffmpeg',
+						'-i', '-',
+						'-map', '0',
+						'-y',
+						'-codec', 'copy',
+						'-write_id3v2', '1',
+						*(
+							element
+							for pair in (
+								('-metadata', f'{key}={value}')
+								for key, value in tags.items()
+							)
+							for element in pair
+						),
+						'-f', 'mp3',
+						'-',
 					),
-					'-f', 'mp3',
-					'-',
-				),
-				input          = self.data,
-				capture_output = True
-			).stdout
+					input          = self.source.data,
+					capture_output = True
+				).stdout
+			)
 		)
 
 	@functools.cached_property
@@ -93,7 +74,7 @@ class Tags:
 				'-f', 'mjpeg',
 				'-'
 			),
-			input          = self.data,
+			input          = self.source.data,
 			capture_output = True
 		).stdout or None
 
