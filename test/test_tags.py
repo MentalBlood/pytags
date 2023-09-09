@@ -2,13 +2,13 @@ import pytest
 import pathlib
 import functools
 
-from .. import tags
+from .. import pytags
 
 
 
 @functools.lru_cache
 def audio():
-	return tags.Tags(tags.Media(pathlib.Path('test.mp3').read_bytes()))
+	return pytags.Tags(pytags.Media(pathlib.Path('test.mp3').read_bytes()))
 
 
 @pytest.mark.parametrize(
@@ -43,5 +43,5 @@ def test_nonexistent_key():
 
 
 def test_invalid_data():
-	with pytest.raises(tags.Media.ValueError):
-		tags.Media(b'invalid_data')
+	with pytest.raises(pytags.Media.ValueError):
+		pytags.Media(b'invalid_data')

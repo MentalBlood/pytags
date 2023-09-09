@@ -1,4 +1,5 @@
 import re
+import datetime
 import functools
 import subprocess
 import dataclasses
@@ -62,6 +63,39 @@ class Tags:
 				).stdout
 			)
 		)
+
+	@functools.cached_property
+	def artist(self):
+		return self['artist']
+
+	@functools.cached_property
+	def album(self):
+		return self['album']
+
+	@functools.cached_property
+	def title(self):
+		return self['title']
+
+	@functools.cached_property
+	def date(self):
+		return datetime.datetime.fromisoformat(self['date'])
+
+	@functools.cached_property
+	def duration(self):
+		hours, minutes, seconds = re.findall(
+			r'time=(\d+):(\d+):(\d+\.\d+)',
+			subprocess.run(
+				args = (
+					'ffmpeg',
+					'-i', '-',
+					'-f', 'null',
+					'-'
+				),
+				input          = self.source.data,
+				capture_output = True
+			).stderr.decode()
+		)[-1]
+		return (int(hours) * 60 + int(minutes)) * 60 + float(seconds)
 
 	@functools.cached_property
 	def cover(self):

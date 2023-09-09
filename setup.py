@@ -6,7 +6,7 @@ import setuptools
 if __name__ == '__main__':
 
 	setuptools.setup(
-		name                          = 'tags',
+		name                          = 'pytags',
 		version                       = '0.1.0',
 		description                   = 'Interface to ffmpeg tagging abilities',
 		long_description              = (pathlib.Path(__file__).parent / 'README.md').read_text(),
